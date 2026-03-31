@@ -3,7 +3,7 @@
 #define LDR_PIN A0
 
 void setup() {
-  Serial.begin(9600); // Standard baud rate for HC-05
+  Serial.begin(9600);
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
 }
@@ -23,7 +23,6 @@ void loop() {
   int lightValue = analogRead(LDR_PIN);
 
   // 3. Send Data to Android via HC-05
-  // Format: "distance,light" -> e.g., "45.2,320"
   Serial.print(distance);
   Serial.print(",");
   Serial.println(lightValue);

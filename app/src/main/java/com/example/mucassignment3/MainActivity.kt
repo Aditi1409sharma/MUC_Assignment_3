@@ -32,8 +32,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import com.example.mucassignment3.bluetooth.BluetoothService
 import com.example.mucassignment3.processor.DataProcessor
@@ -61,7 +63,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MUCAssignment3Theme {
-                SafetyBubbleApp(bluetoothService, sensorHandler, dataProcessor)
+                var showConsent by remember { mutableStateOf(true) }
+                
+                if (showConsent) {
+                    ConsentDialog(onDismiss = { showConsent = false })
+                } else {
+                    SafetyBubbleApp(bluetoothService, sensorHandler, dataProcessor)
+                }
             }
         }
     }
@@ -91,6 +99,52 @@ class MainActivity : ComponentActivity() {
         sensorHandler.stop()
         dataProcessor.stopProcessing()
         dataProcessor.release()
+    }
+}
+
+@Composable
+fun ConsentDialog(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = {}) {
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.elevatedCardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Security,
+                    contentDescription = null,
+                    tint = Color(0xFF3498DB),
+                    modifier = Modifier.size(48.dp)
+                )
+                Text(
+                    text = "Informed Consent",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2C3E50)
+                )
+                Text(
+                    text = "This application collects environmental data (distance, light) and physical movement data (phone sensors) to provide safety alerts. \n\nAll data is stored LOCALLY on this device and is not transmitted to any server. By clicking 'I Agree', you consent to the collection and local storage of this data for research and assistive purposes.",
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray,
+                    lineHeight = 20.sp
+                )
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("I AGREE")
+                }
+            }
+        }
     }
 }
 
